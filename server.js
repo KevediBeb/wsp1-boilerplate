@@ -5,7 +5,7 @@ import logger from "morgan"
 import bcrypt from "bcrypt"
 import session from "express-session"
 import bodyParser from "body-parser"
-import pool from "db.js"
+import pool from "./db.js"
 
 
 const app = express()
@@ -54,14 +54,24 @@ app.get("/", (req, res) => {
   )
 })
 
-app.post('/', async (req, res) => {
+app.post('/login', async (req, res) => {
+  
   console.log(req.body)
+  
   const {name, password} = req.body
   const [result] = await pool
     .promise()
-    .query(`SELECT * FROM user WHERE user.name = user.name`)
+    .query(`SELECT * FROM user WHERE name = ?`, [name])
   
-  console.log(result)
+  console.log(result[0].password)
+  
+  bcrypt.compare(password, result[0].password, function(err, result) {
+    if(result){
+      console.log("rätt")
+    }else{
+      console.log("fel")
+    }
+  });
   res.redirect("/")
 })
 
