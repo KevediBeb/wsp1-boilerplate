@@ -63,16 +63,32 @@ app.post('/login', async (req, res) => {
     .promise()
     .query(`SELECT * FROM user WHERE name = ?`, [name])
   
-  console.log(result[0].password)
+  //
+
+  var success = false
+  if(result[0] !== undefined){
+    console.log(result[0].password)
+    bcrypt.compare(password, result[0].password, function(err, result) {
+      if(result){
+        console.log("rätt")
+        success = true
+      }else{
+        console.log("Wrong username or password")
+        success = false
+      }
+    });
+  }else{
+    console.log("Wrong username or password")
+    success = false
+  }
+  if(success){
+    res.redirect("/loggedin")
+  }else{
+    res.redirect("/")
+  }
   
-  bcrypt.compare(password, result[0].password, function(err, result) {
-    if(result){
-      console.log("rätt")
-    }else{
-      console.log("fel")
-    }
-  });
-  res.redirect("/")
+  
+  
 })
 
 
